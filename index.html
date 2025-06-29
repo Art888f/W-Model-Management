@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>W-Model Management.</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="noise-overlay"></div>
+  <header>
+    <h1>W-Model Management.</h1>
+  </header>
+
+  <main>
+    <section id="hero">
+      <h2>Где продукт встречается с телом</h2>
+      <p class="tagline">Эстетика, которая продаёт.</p>
+      <div class="cta-button">🚀 Запусти визуальный взрыв</div>
+    </section>
+
+    <section id="portfolio">
+      <h3>Кейсы</h3>
+      <div class="gallery">
+        <div class="photo"><img src="1.jpg" alt="Кейс 1" /></div>
+        <div class="photo"><img src="2.jpg" alt="Кейс 2" /></div>
+        <div class="photo"><img src="3.jpg" alt="Кейс 3" /></div>
+        <div class="photo"><img src="4.jpg" alt="Кейс 4" /></div>
+        <div class="photo"><img src="5.jpg" alt="Кейс 5" /></div>
+        <div class="photo"><img src="6.jpg" alt="Кейс 6" /></div>
+        <div class="photo"><img src="7.jpg" alt="Кейс 7" /></div>
+        <div class="photo"><img src="8.jpg" alt="Кейс 8" /></div>
+        <div class="photo"><img src="9.jpg" alt="Кейс 9" /></div>
+        <div class="photo"><img src="10.jpg" alt="Кейс 10" /></div>
+        <div class="photo"><img src="11.jpg" alt="Кейс 11" /></div>
+        <div class="photo"><img src="12.jpg" alt="Кейс 12" /></div>
+      </div>
+    </section>
+    <section id="about">
+      <h3>Что мы делаем</h3>
+      <p>Показываем ваш продукт так, чтобы его хотели. Прямо в Instagram, Reels и в голове клиента.</p>
+      <div class="punch">Сексуализировано? Да. Пошло? Нет.</div>
+    </section>
+
+    <section id="contact">
+      <h3>Свяжись с нами</h3>
+      <p>Telegram: <a href="https://t.me/bashirx" target="_blank">@bashirx</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>2025 © NudeProduct. Сделано с дерзостью и светом.</p>
+  </footer>
+
+  <div class="easter-egg" title="Ты нашёл нас 😉">👀</div>
+
+  <script>
+    const btn = document.querySelector(".cta-button");
+    const egg = document.querySelector(".easter-egg");
+    let toggled = false;
+
+    btn.addEventListener("click", () => {
+      document.body.classList.toggle("flash");
+      setTimeout(() => document.body.classList.remove("flash"), 500);
+    });
+
+    egg.addEventListener("click", () => {
+      toggled = !toggled;
+      egg.innerText = toggled ? "🥵" : "👀";
+      egg.style.transform = toggled ? "scale(1.5) rotate(10deg)" : "scale(1)";
+    });
+  </script>
+</body>
+</html>
