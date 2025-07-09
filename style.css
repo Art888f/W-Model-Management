@@ -70,9 +70,6 @@ nav a:hover {
   text-align: center;
   padding: 3rem 0;
   background-color: #2e2e2e;
-  background-image: url('2.png'); /* Путь к картинке */
-  background-position: left; /* Центрировать */
-  background-repeat: no-repeat; /* Не повторять */
   background-size: contain;
   position: relative;
   z-index: 2;
