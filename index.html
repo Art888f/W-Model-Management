@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>W-Model Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000;
+      color: #aaa;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      overflow-x: hidden;
+      /* cursor: url('cursor.png') 16 16, auto; 16 16 — центр курсора */
+    }
+
+    main {
+      padding: 1rem 1.5vw;
+    }
+
+    .hero-section {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .video-background {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 2;
+    }
+
+    .video-bottom-text {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #aaa;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      z-index: 3;
+      opacity: 0.8;
+    }
+
+        /* Мобильная адаптация */
+    @media (max-width: 769px) {
+      header {
+        padding: 0.8rem 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.1rem;
+        letter-spacing: 3px;
+      }
+
+      .nav-left, .nav-right {
+        gap: 1rem;
+      }
+
+      .nav-left .menu-item,
+      .nav-right a {
+        font-size: 0.9rem;
+      }
+
+      .video-bottom-text {
+        font-size: 0.9rem;
+        letter-spacing: 3px;
+        bottom: 1.5rem;
+      }
+    }
+@media (max-width: 480px) {
+  header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    min-height: 48px;
+    position: relative;
+  }
+
+  .header-center h1 {
+    font-size: clamp(0.8rem, 4vw, 1.2rem);
+    letter-spacing: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-menu-toggle {
+    transform: scale(0.8);
+    margin-left: auto;
+  }
+
+  .nav-left,
+  .nav-right {
+    display: none !important;
+  }
+
+  .video-bottom-text {
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    bottom: 1.5rem;
+  }
+}
+
+
+
+    /* Бургер скрыт по умолчанию */
+    .mobile-menu-toggle {
+      display: none;
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none !important;
+      border: none;
+      box-shadow: none;
+      cursor: pointer;
+      z-index: 15;
+      justify-self: end;
+      width: 6vw;
+      max-width: 40px;
+      height: auto;
+      padding: 0;
+    }
+
+
+    @media (max-width: 480px) {
+      .mobile-menu-toggle {
+        display: block !important;
+        background: none !important;
+        border: none;
+        box-shadow: none;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
+
+    .hamburger {
+      width: 90%;
+      height: 0.3vw; /* масштабируемая толщина */
+      background-color: #aaa;
+      margin: 1.6vw 0;
+      transition: all 0.3s ease;
+      max-height: 3px;
+      border-radius: 0;
+      transform: scaleZ(1);
+      will-change: transform;
+    }
+
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: rgba(170, 170, 170, 0.92);
+      z-index: 20;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+    }
+
+    .mobile-menu-item {
+      color: #000;
+      font-size: 1.5rem;
+      font-family: 'Cormorant Garamond', serif;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .mobile-menu-item:hover {
+      color: #dc653c;
+    }
+
+    .mobile-submenu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: rgba(170, 170, 170, 0.92);
+      z-index: 25;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .mobile-submenu.active {
+      display: flex;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      background: none;
+      border: none;
+      color: #000;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .content-section {
+      position: relative;
+      z-index: 3;
+      background: #000;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5vw;
+      border-bottom: 1px solid rgba(51, 51, 51, 0.8);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      transition: background 0.3s ease;
+      margin: 0;
+    }
+
+    body {
+      padding-top: 0;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      letter-spacing: 6px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: #aaa;
+      white-space: nowrap;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 0 0.5rem;
+    }
+
+    .nav-left, .nav-right {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .nav-left, .nav-right {
+        gap: 1.5rem;
+      }
+      header {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+    }
+
+    @media (max-width: 824px) and (min-width: 770px) {
+      .nav-left, .nav-right {
+        gap: 0.5rem;
+      }
+      header {
+        padding-left: 0.2rem;
+        padding-right: 0.2rem;
+      }
+    }
+
+    .nav-left .menu-item,
+    .nav-right a {
+      color: #aaa;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 300;
+      transition: color 0.3s;
+    }
+
+    .nav-left .menu-item:hover,
+    .nav-right a:hover {
+      color: #dc653c;
+    }
+
+    /* Плашка */
+    #menu-overlay {
+      position: fixed;
+      top: 00px;
+      left: 0;
+      width: 100%;
+      height: 50vh;
+      background-color: rgba(170, 170, 170, 0.92);
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 6rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 1;
+    }
+
+    #menu-overlay.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .overlay-content {
+      color: #000;
+      font-size: 2rem;
+      text-align: center;
+      max-width: 80%;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    h3 {
+      color: #dc653c;
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    section {
+      width: 100%;
+      margin-bottom: 4rem;
+    }
+
+    p, a {
+      font-size: 1.2rem;
+      color: #aaa;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #dc653c;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .photo {
+      background-color: #1a1a1a;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .photo.visible {
+      opacity: 1;
+      transform: translateY(0);
+}
+
+    .photo img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .highlight {
+      background-color: #1a1a1a;
+      padding: 1.2rem;
+      margin-top: 1rem;
+      border-left: 4px solid #dc653c;
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #777;
+      border-top: 1px solid #222;
+      padding-top: 2rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .mobile-submenu {
+  align-items: stretch;
+}
+
+#submenuContent {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 2rem 1.5rem;
+}
+
+#submenuContent h3 {
+  margin-bottom: 2rem; /* отступ снизу у заголовка */
+  text-align: center;
+}
+
+#submenuContent p {
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  display: block;
+}
+
+  .photo.hidden {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+
+  .photo.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav class="nav-left">
+      <span class="menu-item" data-panel="contacts">Контакты</span>
+      <span class="menu-item" data-panel="ideology">Идеология</span>
+      <span class="menu-item" data-panel="team">Команда</span>
+    </nav>
+
+    <div class="header-center">
+  <h1>W-Model Management</h1>
+    </div>
+
+
+    <nav class="nav-right">
+      <a href="history.html">История бренда</a>
+      <a href="services.html">Услуги</a>
+    </nav>
+
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+      <div class="hamburger"></div>
+      <div class="hamburger"></div>
+      <div class="hamburger"></div>
+    </button>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <span class="mobile-menu-item" data-panel="contacts">Контакты</span>
+    <span class="mobile-menu-item" data-panel="ideology">Идеология</span>
+    <span class="mobile-menu-item" data-panel="team">Команда</span>
+    <a href="history.html" class="mobile-menu-item">История бренда</a>
+    <a href="services.html" class="mobile-menu-item">Услуги</a>
+  </div>
+
+  <div class="mobile-submenu" id="mobileSubmenu">
+    <button class="back-button" id="backButton">Назад</button>
+    <div id="submenuContent"></div>
+  </div>
+  
+  <div class="hero-section">
+    <img class="video-background" src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif" alt="background gif" />
+    <div class="video-bottom-text">W-Model Management</div>
+  </div>
+
+  <div id="menu-overlay">
+    <div class="overlay-content" id="overlay-text">Тут будет описание раздела</div>
+  </div>
+<main>
+  <section id="portfolio">
+    <div class="gallery">
+  <div class="photo hidden"><img src="1.jpg" alt="Фото 1"></div>
+  <div class="photo hidden"><img src="2.jpg" alt="Фото 2"></div>
+  <div class="photo hidden"><img src="3.jpg" alt="Фото 3"></div>
+  <div class="photo hidden"><img src="4.jpg" alt="Фото 4"></div>
+  <div class="photo hidden"><img src="5.jpg" alt="Фото 5"></div>
+  <div class="photo hidden"><img src="6.jpg" alt="Фото 6"></div>
+  <div class="photo hidden"><img src="7.jpg" alt="Фото 7"></div>
+  <div class="photo hidden"><img src="8.jpg" alt="Фото 8"></div>
+  <div class="photo hidden"><img src="9.jpg" alt="Фото 9"></div>
+  <div class="photo hidden"><img src="10.jpg" alt="Фото 10"></div>
+  <div class="photo hidden"><img src="11.jpg" alt="Фото 11"></div>
+  <div class="photo hidden"><img src="12.jpg" alt="Фото 12"></div>
+    </div>
+  </section>
+
+  <section id="about">
+    <h3>Наша идеология</h3>
+    <p>Создание сексуального контента для большего внимания и привлечения мужской части аудитории. Без пошлости — с настроением.</p>
+    <div class="highlight">Ваш визуал = ваша цена</div>
+  </section>
+
+  <section id="contact">
+    <h3>Контакт</h3>
+    <p>Для сотрудничества пиши: <a href="https://t.me/bashirx" target="_blank">@bashirx</a></p>
+  </section>
+</main>
+  <footer>
+    2025 © W-Model Management — визуальный соблазн в стиле люкс.
+  </footer>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const photos = document.querySelectorAll(".photo");
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: "0px 0px -20% 0px", // срабатывает, когда фото почти внизу экрана
+      threshold: 0.1
+    });
+
+    photos.forEach(photo => {
+      // Удалим .visible на всякий случай, если они остались
+      photo.classList.remove("visible");
+      observer.observe(photo);
+    });
+  });
+
+
+    const overlay = document.getElementById('menu-overlay');
+    const overlayText = document.getElementById('overlay-text');
+    const items = document.querySelectorAll('.menu-item');
+
+    const messages = {
+      contacts: 'Телеграм, почта, инстаграм — выбирай удобное.',
+      ideology: 'Мы создаём образ, который вызывает реакцию.',
+      team: 'Наши модели, стилисты и фотографы — часть бренда.'
+    };
+
+    let hideTimeout;
+
+    const header = document.querySelector('header');
+    const headerElements = header.querySelectorAll('*');
+
+    items.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        clearTimeout(hideTimeout);
+        const panel = item.dataset.panel;
+        overlayText.textContent = messages[panel] || '';
+        overlay.classList.add('active');
+        header.style.background = 'rgba(170, 170, 170, 0.92)';
+        headerElements.forEach(element => {
+          element.style.color = '#000';
+        });
+      });
+
+      item.addEventListener('mouseleave', () => {
+        hideTimeout = setTimeout(() => {
+          overlay.classList.remove('active');
+          header.style.background = 'rgba(0, 0, 0, 0.8)';
+          headerElements.forEach(element => {
+            element.style.color = '';
+          });
+        }, 300);
+      });
+    });
+
+    overlay.addEventListener('mouseenter', () => {
+      clearTimeout(hideTimeout);
+    });
+
+    overlay.addEventListener('mouseleave', () => {
+      overlay.classList.remove('active');
+      header.style.background = 'rgba(0, 0, 0, 0.8)';
+      headerElements.forEach(element => {
+        element.style.color = '';
+      });
+    });
+
+ 
+
+    // --- Весь код для мобильного меню ---
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileSubmenu = document.getElementById('mobileSubmenu');
+      const backButton = document.getElementById('backButton');
+      const submenuContent = document.getElementById('submenuContent');
+      const mobileMenuItems = document.querySelectorAll('.mobile-menu-item[data-panel]');
+      const header = document.querySelector('header');
+      const headerElements = header.querySelectorAll('*');
+
+      if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', function() {
+          mobileMenu.classList.add('active');
+          header.style.background = 'rgba(170, 170, 170, 0.92)';
+          headerElements.forEach(element => {
+            element.style.color = '#000';
+          });
+        });
+      }
+
+      mobileMenuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const panel = item.dataset.panel;
+          const messages = {
+            contacts: 'Телеграм, почта, инстаграм — выбирай удобное.',
+            ideology: 'Мы создаём образ, который вызывает реакцию.',
+            team: 'Наши модели, стилисты и фотографы — часть бренда.'
+          };
+          const message = messages[panel] || '';
+          submenuContent.innerHTML = `
+            <h3 style="color: #000; font-size: 2rem; margin-bottom: 1rem;">${item.textContent}</h3>
+            <p style="color: #000; font-size: 1.5rem; text-align: center;">${message}</p>
+          `;
+          mobileMenu.classList.remove('active');
+          mobileSubmenu.classList.add('active');
+        });
+      });
+
+      if (backButton) {
+        backButton.addEventListener('click', function() {
+          mobileSubmenu.classList.remove('active');
+          mobileMenu.classList.add('active');
+        });
+      }
+
+      // Закрытие мобильного меню при клике вне его
+      if (mobileMenu) {
+        mobileMenu.addEventListener('click', function(e) {
+          if (e.target === mobileMenu) {
+            mobileMenu.classList.remove('active');
+            header.style.background = 'rgba(0, 0, 0, 0.8)';
+            headerElements.forEach(element => {
+              element.style.color = '';
+            });
+          }
+        });
+      }
+      if (mobileSubmenu) {
+        mobileSubmenu.addEventListener('click', function(e) {
+          if (e.target === mobileSubmenu) {
+            mobileSubmenu.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            header.style.background = 'rgba(0, 0, 0, 0.8)';
+            headerElements.forEach(element => {
+              element.style.color = '';
+            });
+          }
+        });
+      }
+    });
+    // --- Конец кода для мобильного меню ---
+  </script>
+</body>
+</html>
